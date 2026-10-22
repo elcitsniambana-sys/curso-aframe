@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Curso A-Frame · RV e RA na Web</title>
+  <meta name="description" content="Material do curso de 3 horas: Realidade Virtual e Aumentada na Web com A-Frame 1.8.">
+  <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@2.0.4/dist/qrcode.js"></script>
+  <style>
+    :root {
+      --bg: #F6F7F9; --fg: #101828; --muted: #475467; --card: #FFFFFF; --line: #E4E7EC;
+      --acc: #0E7490; --acc-2: #C2410C; --chip: #EEF2F6; --ok: #067647; --warn: #B54708;
+      --shadow: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.08);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #0B1220; --fg: #E6EAF2; --muted: #9AA4B2; --card: #111A2B; --line: #1F2A3D;
+              --acc: #22D3EE; --acc-2: #FB923C; --chip: #172235; --ok: #4ADE80; --warn: #FBBF24; --shadow: none; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    a { color: var(--acc); }
+    .wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+    header { padding: 40px 0 24px; border-bottom: 1px solid var(--line); }
+    .kicker { font: 600 13px/1 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: .08em; text-transform: uppercase; color: var(--acc-2); }
+    h1 { font-size: clamp(1.8rem, 4.5vw, 2.8rem); line-height: 1.1; margin: .35em 0 .3em; letter-spacing: -.02em; text-wrap: balance; }
+    .lead { font-size: 1.1rem; color: var(--muted); max-width: 720px; margin: 0; }
+    section { padding: 28px 0 8px; }
+    h2 { font-size: 1.35rem; margin: 0 0 4px; letter-spacing: -.01em; }
+    .sub { color: var(--muted); margin: 0 0 16px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; box-shadow: var(--shadow);
+            display: flex; flex-direction: column; gap: 8px; }
+    .card h3 { margin: 0; font-size: 1.05rem; display: flex; gap: 10px; align-items: baseline; }
+    .num { font: 700 .85rem/1 ui-monospace, monospace; color: var(--acc-2); }
+    .card p { margin: 0; color: var(--muted); font-size: .95rem; }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip { font-size: .78rem; padding: 2px 8px; border-radius: 999px; background: var(--chip); color: var(--fg); }
+    .chip.ok { color: var(--ok); } .chip.warn { color: var(--warn); }
+    .acoes { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 6px; }
+    .btn { font: 600 .9rem/1 system-ui, sans-serif; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--line);
+           background: var(--card); color: var(--fg); text-decoration: none; cursor: pointer; }
+    .btn.primario { background: var(--acc); border-color: var(--acc); color: #fff; }
+    @media (prefers-color-scheme: dark) { .btn.primario { color: #06202A; } }
+    .qr { display: none; justify-content: center; padding: 10px; background: #fff; border-radius: 10px; }
+    .qr.aberto { display: flex; } .qr svg { width: 168px; height: 168px; }
+    .destaque { display: grid; grid-template-columns: 1fr auto; gap: 18px; align-items: center; background: var(--card);
+                border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: var(--shadow); margin-top: 22px; }
+    .destaque code { word-break: break-all; }
+    @media (max-width: 640px) { .destaque { grid-template-columns: 1fr; } }
+    #qr-site { background: #fff; padding: 8px; border-radius: 10px; line-height: 0; justify-self: center; }
+    #qr-site svg { width: 150px; height: 150px; }
+    table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: .95rem; }
+    th { background: var(--chip); font-weight: 600; }
+    td.t { font: 600 .9rem ui-monospace, monospace; white-space: nowrap; color: var(--acc-2); }
+    .tabela { overflow-x: auto; }
+    ul.links { columns: 2 280px; padding-left: 1.1em; margin: 0; } ul.links li { margin: 0 0 6px; break-inside: avoid; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--chip); padding: 1px 6px; border-radius: 6px; font-size: .88em; }
+    footer { margin-top: 36px; padding: 22px 0 40px; border-top: 1px solid var(--line); color: var(--muted); font-size: .9rem; }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="kicker">Curso de 3 horas · A-Frame 1.8 · WebXR</div>
+    <h1>Realidade Virtual e Aumentada na Web com A&#8209;Frame</h1>
+    <p class="lead">Do “Olá, Mundo” em três dimensões a um mostruário 3D próprio, com modelos baixados da Web e peças CAD,
+      publicado gratuitamente no seu GitHub e aberto no celular, no PC ou em óculos de RV.</p>
+
+    <div class="destaque">
+      <div>
+        <strong>Este é o seu site publicado.</strong>
+        <p class="sub" style="margin:.3em 0 .6em">Endereço atual: <code id="url-site">—</code></p>
+        <p class="sub" style="margin:0">Aponte a câmera do celular para o QR deste quadro para abrir esta página nele.
+          RV e RA exigem <b>HTTPS</b> — o GitHub Pages já fornece. <span id="link-codigo"></span></p>
+      </div>
+      <div id="qr-site" aria-label="QR code deste endereço"></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section id="roteiro">
+    <h2>Roteiro da aula (180 min)</h2>
+    <p class="sub">Cada bloco combina demonstração do professor e prática imediata.</p>
+    <div class="tabela">
+    <table>
+      <tr><th>Horário</th><th>Bloco</th><th>Material</th></tr>
+      <tr><td class="t">0:00–0:15</td><td>Abertura: RV, RA, XR, WebXR; por que A-Frame</td><td>Slides · showcase em aframe.io</td></tr>
+      <tr><td class="t">0:15–0:30</td><td>Montagem do ambiente: repositório a partir do modelo, GitHub Pages, editor github.dev</td><td>Apostila, cap. 3</td></tr>
+      <tr><td class="t">0:30–1:00</td><td>Fundamentos: cena, primitivas, coordenadas, hierarquia, materiais, luz e sombra</td><td>Exemplos 01–03 · Exercício 1</td></tr>
+      <tr><td class="t">1:00–1:25</td><td>Modelos 3D e CAD: glTF, fontes gratuitas, conversão, otimização, escala</td><td>Exemplo 04 · Exercício 2</td></tr>
+      <tr><td class="t">1:25–1:35</td><td><i>Intervalo</i></td><td></td></tr>
+      <tr><td class="t">1:35–2:05</td><td>Interação: animação, cursor, eventos, componentes em JavaScript</td><td>Exemplos 05–06 · Exercício 3</td></tr>
+      <tr><td class="t">2:05–2:20</td><td>RV imersiva: rig, locomoção, controles, mãos, desempenho</td><td>Exemplo 07</td></tr>
+      <tr><td class="t">2:20–2:45</td><td>Realidade Aumentada: WebXR, marcador (AR.js) e imagem (MindAR)</td><td>Exemplos 08–10 · Exercício 4</td></tr>
+      <tr><td class="t">2:45–3:00</td><td>Projeto final, galeria de links da turma, próximos passos</td><td>Projeto final</td></tr>
+    </table>
+    </div>
+  </section>
+
+  <section id="exemplos">
+    <h2>Exemplos comentados</h2>
+    <p class="sub">Abra, explore, e depois leia o código-fonte: cada arquivo é uma aula em comentários.</p>
+    <div class="grid" id="grade-exemplos"></div>
+  </section>
+
+  <section id="exercicios">
+    <h2>Exercícios</h2>
+    <p class="sub">Arquivos com tarefas marcadas como <code>TODO</code> e dicas. Soluções em <code>exercicios/solucoes/</code>.</p>
+    <div class="grid" id="grade-exercicios"></div>
+  </section>
+
+  <section id="projeto">
+    <h2>Projeto final e materiais de apoio</h2>
+    <p class="sub">&nbsp;</p>
+    <div class="grid" id="grade-projeto"></div>
+  </section>
+
+  <section id="recursos">
+    <h2>Referências e fontes de modelos 3D gratuitos</h2>
+    <p class="sub">Sempre confira a licença de cada modelo e dê os créditos exigidos.</p>
+    <ul class="links">
+      <li><a href="https://aframe.io/docs/1.8.0/introduction/" target="_blank" rel="noopener">Documentação oficial do A-Frame 1.8</a></li>
+      <li><a href="https://aframe.io/examples/showcase/helloworld/" target="_blank" rel="noopener">Exemplos oficiais (showcase)</a></li>
+      <li><a href="https://aframe.wiki/en/#!pages/ar.md" target="_blank" rel="noopener">A-Frame Wiki — Realidade Aumentada</a></li>
+      <li><a href="https://www.futurelearn.com/courses/a-beginners-guide-to-creating-a-webvr-experience-using-aframe" target="_blank" rel="noopener">FutureLearn — A Beginner’s Guide to Creating a VR Experience</a></li>
+      <li><a href="https://github.com/c-frame/aframe-extras" target="_blank" rel="noopener">A-Frame Extras (controles, animation-mixer)</a></li>
+      <li><a href="https://github.com/supermedium/aframe-environment-component" target="_blank" rel="noopener">aframe-environment-component</a></li>
+      <li><a href="https://ar-js-org.github.io/AR.js-Docs/" target="_blank" rel="noopener">AR.js — documentação</a></li>
+      <li><a href="https://hiukim.github.io/mind-ar-js-doc/" target="_blank" rel="noopener">MindAR — documentação e compilador de alvos</a></li>
+      <li><a href="https://poly.pizza" target="_blank" rel="noopener">Poly Pizza — low-poly CC0/CC-BY em GLB</a></li>
+      <li><a href="https://sketchfab.com/features/free-3d-models" target="_blank" rel="noopener">Sketchfab — modelos Creative Commons (glTF)</a></li>
+      <li><a href="https://science.nasa.gov/3d-resources/" target="_blank" rel="noopener">NASA 3D Resources — GLB, uso livre</a></li>
+      <li><a href="https://3d.si.edu/explore" target="_blank" rel="noopener">Smithsonian 3D — acervo CC0 em glTF</a></li>
+      <li><a href="https://kenney.nl/assets" target="_blank" rel="noopener">Kenney</a> e <a href="https://quaternius.com" target="_blank" rel="noopener">Quaternius</a> — pacotes CC0</li>
+      <li><a href="https://polyhaven.com/models" target="_blank" rel="noopener">Poly Haven — modelos, texturas e HDRIs CC0</a></li>
+      <li><a href="https://github.com/KhronosGroup/glTF-Sample-Assets" target="_blank" rel="noopener">Khronos glTF Sample Assets</a></li>
+      <li><a href="https://grabcad.com/library" target="_blank" rel="noopener">GrabCAD Library</a>, <a href="https://www.printables.com" target="_blank" rel="noopener">Printables</a>, <a href="https://www.thingiverse.com" target="_blank" rel="noopener">Thingiverse</a> — CAD/STL</li>
+      <li><a href="https://3dviewer.net" target="_blank" rel="noopener">3dviewer.net — abre STEP/IGES/STL/OBJ e exporta GLB</a></li>
+      <li><a href="https://gltf.report" target="_blank" rel="noopener">gltf.report — inspeciona e otimiza glTF no navegador</a></li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    Código dos exemplos sob licença MIT. Modelos e imagens: ver <a href="CREDITOS.md">CREDITOS.md</a>.
+    Feito com <a href="https://aframe.io" target="_blank" rel="noopener">A-Frame</a>.
+  </div>
+</footer>
+
+<script>
+  // ------------------------------------------------------------------
+  // Dados das páginas (fácil de manter: edite estes vetores)
+  // ------------------------------------------------------------------
+  var EXEMPLOS = [
+    ['01', 'Olá, Mundo!', 'exemplos/01-ola-mundo/', 'A menor cena possível: primitivas, céu e texto com acentos.', ['PC', 'Celular', 'Óculos RV']],
+    ['02', 'Transformações e hierarquia', 'exemplos/02-transformacoes-hierarquia/', 'Eixos, position/rotation/scale, grupos e um sistema solar com pivôs.', ['PC', 'Celular', 'Óculos RV']],
+    ['03', 'Materiais, luz e sombra', 'exemplos/03-materiais-luz-sombra/', 'Texturas repetidas, PBR, transparência, luzes, sombras e céu 360°.', ['PC', 'Celular', 'Óculos RV']],
+    ['04', 'Modelos 3D e CAD', 'exemplos/04-modelos-3d/', 'glTF/GLB, Draco, animações embutidas e escala de peça CAD em milímetros.', ['PC', 'Celular', 'Óculos RV']],
+    ['05', 'Animação e interação', 'exemplos/05-animacao-interacao/', 'animation, cursor, mouseenter/click, som e eventos personalizados.', ['PC', 'Celular', 'Óculos RV']],
+    ['06', 'Componentes em JavaScript', 'exemplos/06-componentes-js/', 'registerComponent: schema, init, tick, eventos e criação de entidades.', ['PC', 'Celular', 'Óculos RV']],
+    ['07', 'RV imersiva', 'exemplos/07-rv-imersiva/', 'Rig, movement-controls, teletransporte, laser, mãos e ambiente pronto.', ['PC', 'Celular', 'Óculos RV']],
+    ['08', 'RA com WebXR', 'exemplos/08-ra-webxr/', 'Detecção de superfícies (hit-test): coloque um astronauta em tamanho real.', ['Android + ARCore', 'Meta Quest', '!iPhone não']],
+    ['09', 'RA com marcador (AR.js)', 'exemplos/09-ra-marcador-arjs/', 'Marcador Hiro e marcador próprio do curso. Funciona em qualquer celular.', ['Android', 'iPhone']],
+    ['10', 'RA por imagem (MindAR)', 'exemplos/10-ra-imagem-mindar/', 'Uma imagem comum vira alvo: peça CAD sobre o cartão do curso.', ['Android', 'iPhone']]
+  ];
+  var EXERCICIOS = [
+    ['E1', 'Minha primeira sala', 'exercicios/ex1-minha-sala/', 'exercicios/solucoes/ex1.html', 'Paredes, mesa em grupo, luminária, céu 360° e seu nome.'],
+    ['E2', 'Meu modelo 3D', 'exercicios/ex2-meu-modelo/', 'exercicios/solucoes/ex2.html', 'Baixar, converter, otimizar, enviar e escalar um modelo (ou CAD).'],
+    ['E3', 'Painel interativo', 'exercicios/ex3-interatividade/', 'exercicios/solucoes/ex3.html', 'Botões com animação, eventos e um componente JavaScript seu.'],
+    ['E4', 'Minha RA', 'exercicios/ex4-minha-ra/', 'exercicios/solucoes/ex4.html', 'Seu modelo em RA: WebXR, marcador Hiro ou imagem própria.']
+  ];
+  var APOIO = [
+    ['★', 'Projeto final: Mostruário 3D', 'projeto-final/', 'Galeria em RV e RA gerada a partir de uma lista. Edite o ACERVO e publique.', ['PC', 'Celular', 'Óculos RV', 'RA: Android/Quest']],
+    ['⎙', 'Marcadores para imprimir', 'marcadores.html', 'Hiro, marcador do curso e imagem-alvo do MindAR, prontos para A4.', ['Imprimir', 'ou abrir em outra tela']]
+  ];
+
+  // ------------------------------------------------------------------
+  function svgQR(texto) {
+    var qr = qrcode(0, 'M'); qr.addData(texto); qr.make();
+    return qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
+  }
+  function absoluta(rel) { return new URL(rel, location.href).href; }
+
+  // Link para o código no GitHub (deduzido de usuario.github.io/repositorio/)
+  function linkCodigo(rel) {
+    var h = location.hostname;
+    if (!/\.github\.io$/.test(h)) return null;
+    var usuario = h.split('.')[0];
+    var partes = location.pathname.split('/').filter(Boolean);
+    var repo = partes.length ? partes[0] : h;
+    return 'https://github.com/' + usuario + '/' + repo + '/tree/main/' + rel.replace(/\/$/, '');
+  }
+
+  function chips(lista) {
+    return '<div class="chips">' + lista.map(function (c) {
+      var cls = c.charAt(0) === '!' ? 'chip warn' : 'chip';
+      return '<span class="' + cls + '">' + c.replace(/^!/, '') + '</span>';
+    }).join('') + '</div>';
+  }
+
+  function cartao(num, titulo, rel, desc, extrasHtml, botoesExtras) {
+    var cod = linkCodigo(rel);
+    var id = 'qr-' + Math.random().toString(36).slice(2, 8);
+    return '<article class="card">' +
+      '<h3><span class="num">' + num + '</span>' + titulo + '</h3>' +
+      '<p>' + desc + '</p>' + (extrasHtml || '') +
+      '<div class="acoes">' +
+        '<a class="btn primario" href="' + rel + '">Abrir</a>' + (botoesExtras || '') +
+        (cod ? '<a class="btn" href="' + cod + '" target="_blank" rel="noopener">Código</a>' : '') +
+        '<button class="btn" type="button" data-qr="' + id + '" data-url="' + absoluta(rel) + '">QR celular</button>' +
+      '</div><div class="qr" id="' + id + '"></div></article>';
+  }
+
+  document.getElementById('grade-exemplos').innerHTML =
+    EXEMPLOS.map(function (e) { return cartao(e[0], e[1], e[2], e[3], chips(e[4])); }).join('');
+  document.getElementById('grade-exercicios').innerHTML =
+    EXERCICIOS.map(function (e) { return cartao(e[0], e[1], e[2], e[4], '', '<a class="btn" href="' + e[3] + '">Solução</a>'); }).join('');
+  document.getElementById('grade-projeto').innerHTML =
+    APOIO.map(function (e) { return cartao(e[0], e[1], e[2], e[3], chips(e[4])); }).join('');
+
+  // QR sob demanda em cada cartão
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest('[data-qr]'); if (!b) return;
+    var caixa = document.getElementById(b.dataset.qr);
+    if (!caixa.innerHTML && window.qrcode) caixa.innerHTML = svgQR(b.dataset.url);
+    caixa.classList.toggle('aberto');
+  });
+
+  // Destaque do topo: endereço + QR do próprio site
+  document.getElementById('url-site').textContent = location.href;
+  if (window.qrcode) document.getElementById('qr-site').innerHTML = svgQR(location.href);
+  var raiz = linkCodigo('');
+  if (raiz) document.getElementById('link-codigo').innerHTML =
+    'Repositório: <a href="' + raiz.replace(/\/tree\/main\/?$/, '') + '" target="_blank" rel="noopener">abrir no GitHub</a>.';
+</script>
+</body>
+</html>

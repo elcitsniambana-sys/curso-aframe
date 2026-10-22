@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<!-- SOLUÇÃO — Exercício 4 (opção B): dois modelos em dois marcadores, com título e créditos. -->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solução 4 · Minha RA — Curso A-Frame</title>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js@3.4.8/aframe/build/aframe-ar.js"></script>
+  <script src="../../js/curso-utilitarios.js"></script>
+</head>
+<body style="margin: 0; overflow: hidden;">
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false"
+           xr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true"
+           gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/versioned/decoders/1.5.6/">
+    <a-assets timeout="30000">
+      <a-asset-item id="lanterna" src="../../assets/modelos/lanterna.glb"></a-asset-item>
+      <a-asset-item id="hubble"   src="../../assets/modelos/hubble.glb"></a-asset-item>
+    </a-assets>
+
+    <a-mixin id="legenda" text="font: ../../assets/fontes/dejavu-pt-sdf.json; align: center; width: 1.6; wrapCount: 24; color: #FFFFFF"></a-mixin>
+
+    <!-- Marcador Hiro → lanterna da altura de 1,2 marcador, com título que gira para a câmera -->
+    <a-marker preset="hiro" smooth="true">
+      <a-entity gltf-model="#lanterna" ajustar-tamanho="altura: 1.2"></a-entity>
+      <a-entity mixin="legenda" position="0 1.45 0" text="value: Lanterna (Khronos, CC0)"></a-entity>
+    </a-marker>
+
+    <!-- Marcador do curso → Hubble flutuando e girando -->
+    <a-marker type="pattern" url="../../assets/marcadores/marcador-curso.patt" smooth="true">
+      <a-entity position="0 0.8 0" animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear">
+        <a-entity gltf-model="#hubble" ajustar-tamanho="largura: 1; apoiarNoChao: false"></a-entity>
+      </a-entity>
+      <a-entity mixin="legenda" position="0 1.7 0" text="value: Hubble (NASA)"></a-entity>
+    </a-marker>
+
+    <a-entity light="type: hemisphere; intensity: 1.2"></a-entity>
+    <a-entity light="type: directional; intensity: 1.5" position="1 2 1"></a-entity>
+    <a-entity camera></a-entity>
+  </a-scene>
+</body>
+</html>

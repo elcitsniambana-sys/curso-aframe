@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  CURSO A-FRAME · Exemplo 04 — Modelos 3D (glTF/GLB) e peças CAD
+  ------------------------------------------------------------
+  Conceitos:
+   • glTF 2.0 é o "JPEG do 3D": o formato recomendado para a Web.
+     .gltf (JSON + arquivos externos) ou .glb (binário, tudo num arquivo só — prefira este).
+   • <a-asset-item> pré-carrega o arquivo; gltf-model="#id" instancia o modelo.
+   • ESCALA: cada modelo vem numa unidade diferente. Inspecione a caixa envolvente
+     (bounding box) em https://gltf.report ou https://3dviewer.net e ajuste "scale".
+       - CAD mecânico costuma estar em MILÍMETROS → scale="0.001 0.001 0.001" = tamanho real.
+   • Compressão Draco: os modelos da NASA usam KHR_draco_mesh_compression.
+     O A-Frame 1.8 baixa o decodificador automaticamente (www.gstatic.com).
+   • Animações embutidas no glTF: componente animation-mixer (A-Frame Extras).
+   • Eventos: model-loaded (sucesso) e model-error (falha).
+  ============================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>04 · Modelos 3D e CAD — Curso A-Frame</title>
+  <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+  <!-- A-Frame Extras: apenas o pacote de "loaders" (traz o animation-mixer). -->
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.7.0/dist/aframe-extras.loaders.min.js"></script>
+  <style>
+    .voltar { position: fixed; top: 12px; left: 12px; z-index: 10; font: 600 14px system-ui, sans-serif;
+              background: rgba(17,24,39,.85); color: #fff; padding: 8px 12px; border-radius: 8px; text-decoration: none; }
+    #status { position: fixed; bottom: 12px; left: 12px; z-index: 10; font: 13px system-ui, sans-serif;
+              background: rgba(17,24,39,.85); color: #fff; padding: 8px 12px; border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <a class="voltar" href="../../index.html">← Índice do curso</a>
+  <div id="status">Carregando modelos…</div>
+
+  <!-- reflection: gera um mapa de ambiente para que materiais PBR dos modelos não fiquem escuros. -->
+  <a-scene reflection="directionalLight: #sol" background="color: #1F2937">
+
+    <a-assets timeout="30000">
+      <a-asset-item id="astronauta"  src="../../assets/modelos/astronauta.glb"></a-asset-item>
+      <a-asset-item id="hubble"      src="../../assets/modelos/hubble.glb"></a-asset-item>
+      <a-asset-item id="raposa"      src="../../assets/modelos/raposa.glb"></a-asset-item>
+      <a-asset-item id="lanterna"    src="../../assets/modelos/lanterna.glb"></a-asset-item>
+      <a-asset-item id="acoplamento" src="../../assets/modelos/acoplamento.glb"></a-asset-item>
+      <img id="grade" src="../../assets/texturas/grade.png">
+    </a-assets>
+
+    <!-- Um mixin guarda um conjunto de atributos reutilizável (aqui: estilo das legendas). -->
+    <a-mixin id="legenda" text="font: ../../assets/fontes/dejavu-pt-sdf.json; align: center; width: 2.2; color: #F9FAFB"></a-mixin>
+
+    <a-entity camera look-controls wasd-controls position="0 1.6 2.2"></a-entity>
+    <a-plane rotation="-90 0 0" width="20" height="20" material="src: #grade; repeat: 10 10"></a-plane>
+
+    <!-- ========== 1. NASA — Astronauta (Draco). Caixa original: ~74 unidades de altura. ========== -->
+    <!-- 74 × 0,025 = 1,85 m. A origem do modelo está no centro → subimos metade da altura (0,93 m). -->
+    <a-entity position="-2.6 0 -1.5" rotation="0 35 0">
+      <a-cylinder radius="0.6" height="0.1" position="0 0.05 0" color="#374151"></a-cylinder>
+      <a-entity gltf-model="#astronauta" scale="0.025 0.025 0.025" position="0 1.03 0"></a-entity>
+      <a-entity mixin="legenda" position="0 2.15 0" text="value: Astronauta · NASA 3D Resources\nscale 0,025 → 1,85 m"></a-entity>
+    </a-entity>
+
+    <!-- ========== 2. NASA — Telescópio Hubble (Draco), flutuando e girando ========== -->
+    <a-entity position="-1 2 -3.2">
+      <a-entity gltf-model="#hubble" scale="0.004 0.004 0.004"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 30000; easing: linear"></a-entity>
+      <a-entity mixin="legenda" position="0 1.35 0" text="value: Telescópio Hubble · NASA"></a-entity>
+    </a-entity>
+
+    <!-- ========== 3. Khronos — Raposa com 3 animações embutidas (Survey, Walk, Run) ========== -->
+    <a-entity position="1 0 -2.6">
+      <a-entity gltf-model="#raposa" scale="0.008 0.008 0.008" position="-0.8 0 0" animation-mixer="clip: Survey"></a-entity>
+      <a-entity gltf-model="#raposa" scale="0.008 0.008 0.008" position="0 0 0"    animation-mixer="clip: Walk"></a-entity>
+      <a-entity gltf-model="#raposa" scale="0.008 0.008 0.008" position="0.8 0 0"  animation-mixer="clip: Run"></a-entity>
+      <a-entity mixin="legenda" position="0 1.05 0" text="value: animation-mixer: clip Survey · Walk · Run"></a-entity>
+    </a-entity>
+
+    <!-- ========== 4. Khronos — Lanterna (otimizada: 9,6 MB → 0,44 MB com texturas WebP) ========== -->
+    <a-entity position="2.7 0 -1.2" rotation="0 -40 0">
+      <a-entity gltf-model="#lanterna" scale="0.06 0.06 0.06"></a-entity>
+      <a-entity mixin="legenda" position="0.3 1.85 0" text="value: Lanterna (glTF otimizado)\n9,6 MB → 0,44 MB"></a-entity>
+    </a-entity>
+
+    <!-- ========== 5. Peça CAD — acoplamento de flanges (modelado em mm, exportado STEP → GLB) ========== -->
+    <a-entity position="0 0 -1">
+      <!-- Pedestal de 0,9 m com a peça em TAMANHO REAL (mm → m: scale 0,001) -->
+      <a-box width="0.4" height="0.9" depth="0.4" position="-0.45 0.45 0" color="#4B5563"></a-box>
+      <a-entity gltf-model="#acoplamento" scale="0.001 0.001 0.001" position="-0.45 0.955 0"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear"></a-entity>
+      <a-entity mixin="legenda" position="-0.45 1.25 0" text="value: CAD 1:1 (scale 0,001)"></a-entity>
+
+      <!-- A mesma peça ampliada 5× para enxergar os detalhes -->
+      <a-entity gltf-model="#acoplamento" scale="0.005 0.005 0.005" position="0.45 0.275 0" rotation="0 20 0"></a-entity>
+      <a-entity mixin="legenda" position="0.45 1.05 0" text="value: Mesma peça ampliada 5×"></a-entity>
+    </a-entity>
+
+    <a-entity light="type: hemisphere; color: #EEF2FF; groundColor: #374151; intensity: 1"></a-entity>
+    <a-entity id="sol" light="type: directional; intensity: 2" position="2 4 3"></a-entity>
+  </a-scene>
+
+  <script>
+    // Eventos de carregamento: úteis para mostrar progresso e detectar erros de caminho.
+    const status = document.getElementById('status');
+    const modelos = document.querySelectorAll('[gltf-model]');
+    let ok = 0;
+    modelos.forEach(function (el) {
+      el.addEventListener('model-loaded', function () {
+        ok++;
+        status.textContent = ok + ' de ' + modelos.length + ' modelos carregados';
+        if (ok === modelos.length) setTimeout(function () { status.style.display = 'none'; }, 2500);
+      });
+      el.addEventListener('model-error', function (evt) {
+        status.textContent = 'Erro ao carregar ' + evt.detail.src + ' (veja o Console: F12)';
+        status.style.background = '#B91C1C';
+      });
+    });
+  </script>
+</body>
+</html>

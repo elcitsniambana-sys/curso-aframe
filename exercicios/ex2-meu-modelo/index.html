@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  EXERCÍCIO 2 — Trazer um modelo 3D (ou CAD) da Web para a cena   (≈ 15 min)
+  ------------------------------------------------------------
+  Objetivo: o fluxo completo "baixar → converter (se preciso) → otimizar → publicar → escalar".
+
+  Passo a passo:
+   1. Escolha um modelo GRATUITO e anote a LICENÇA e o AUTOR:
+        • Poly Pizza (poly.pizza) ............ low-poly, CC0/CC-BY, botão "Download GLB"
+        • Sketchfab (sketchfab.com) .......... filtre "Downloadable"; baixe "glTF (.glb)"
+        • NASA 3D Resources (science.nasa.gov/3d-resources) .... GLB, uso livre
+        • Smithsonian 3D (3d.si.edu) ......... CC0, glTF
+        • Kenney (kenney.nl/assets) / Quaternius (quaternius.com) .... CC0
+        • CAD: GrabCAD, Printables, Thingiverse (STEP/STL) → converta em 3dviewer.net
+          (abra o arquivo → botão Export → GLB)
+   2. Se o arquivo tiver mais de ~5 MB, otimize em https://gltf.report
+      (aba "Script": textureResize/webp) ou com o glTF-Transform (ver apostila).
+   3. No GitHub, abra a pasta assets/meus-modelos → "Add file" → "Upload files"
+      → arraste o .glb → "Commit changes".
+   4. Troque o caminho no <a-asset-item id="meu-modelo"> abaixo pelo seu arquivo.
+   5. Ajuste o tamanho: veja as medidas na placa (componente medir-modelo) e
+      calcule scale = tamanho_desejado ÷ tamanho_original. Ou use ajustar-tamanho.
+   6. Preencha a placa de CRÉDITOS (autor, fonte, licença). Licença CC-BY exige crédito!
+
+  Solução: exercicios/solucoes/ex2.html
+  ============================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercício 2 · Meu modelo 3D — Curso A-Frame</title>
+  <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+  <!-- Utilitários do curso: medir-modelo e ajustar-tamanho -->
+  <script src="../../js/curso-utilitarios.js"></script>
+</head>
+<body>
+  <a-scene reflection="directionalLight: #sol" background="color: #1E293B">
+    <a-assets timeout="30000">
+      <!-- TODO 4: troque pelo SEU arquivo, ex.: ../../assets/meus-modelos/cadeira.glb -->
+      <a-asset-item id="meu-modelo" src="../../assets/modelos/lanterna.glb"></a-asset-item>
+      <img id="grade" src="../../assets/texturas/grade.png">
+    </a-assets>
+
+    <a-entity camera look-controls wasd-controls position="0 1.6 2.5"></a-entity>
+    <a-plane rotation="-90 0 0" width="10" height="10" material="src: #grade; repeat: 5 5"></a-plane>
+
+    <!-- Pedestal -->
+    <a-cylinder position="0 0.05 -1" radius="0.8" height="0.1" color="#334155"></a-cylinder>
+
+    <!-- TODO 5: ajuste scale e position até o modelo ficar do tamanho certo, em pé no pedestal.
+         A placa à direita mostra as medidas originais e as medidas na cena. -->
+    <!-- Comece pequeno (0.02) e aumente. Se o modelo "sumir", ele pode estar gigante (você está dentro dele)
+         ou minúsculo — confira as medidas na placa ou no Console (F12). -->
+    <a-entity id="modelo" gltf-model="#meu-modelo" position="0 0.1 -1" scale="0.02 0.02 0.02"
+              medir-modelo="saida: #medidas"></a-entity>
+
+    <!-- Placa de medidas (preenchida automaticamente) -->
+    <a-entity position="1.6 1.4 -1" rotation="0 -25 0">
+      <a-plane width="1.5" height="0.5" material="color: #0F172A"></a-plane>
+      <a-entity id="medidas" position="0 0 0.01"
+                text="value: medindo…; font: ../../assets/fontes/dejavu-pt-sdf.json; width: 1.4; wrapCount: 34; align: center; color: #E2E8F0"></a-entity>
+    </a-entity>
+
+    <!-- TODO 6: créditos (obrigatório para CC-BY!) -->
+    <a-entity position="-1.6 1.4 -1" rotation="0 25 0">
+      <a-plane width="1.5" height="0.5" material="color: #0F172A"></a-plane>
+      <a-entity position="0 0 0.01"
+                text="value: Modelo: NOME\nAutor: FULANO · Fonte: SITE\nLicença: CC-BY 4.0; font: ../../assets/fontes/dejavu-pt-sdf.json; width: 1.4; wrapCount: 30; align: center; color: #FDE68A"></a-entity>
+    </a-entity>
+
+    <a-entity light="type: hemisphere; intensity: 1"></a-entity>
+    <a-entity id="sol" light="type: directional; intensity: 2" position="2 4 3"></a-entity>
+  </a-scene>
+</body>
+</html>

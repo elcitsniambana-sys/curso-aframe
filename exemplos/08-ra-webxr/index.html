@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  CURSO A-FRAME · Exemplo 08 — Realidade Aumentada com WebXR (sem marcador)
+  ------------------------------------------------------------
+  Onde funciona: Chrome no Android com "Google Play Services for AR" (ARCore)
+                 e navegador dos óculos Meta Quest (passthrough).
+  NÃO funciona no iPhone/iPad (Safari ainda não implementa WebXR) — para iOS
+  use os exemplos 09 (marcador) e 10 (imagem), que funcionam pela câmera comum.
+
+  Conceitos:
+   • xr-mode-ui="XRMode: ar" → mostra só o botão "AR".
+   • webxr="optionalFeatures: hit-test …" → pede o recurso de "hit test":
+     o aparelho detecta superfícies reais (chão, mesa) sob o retículo.
+   • ar-hit-test="target: #modelo" → toque na tela e o modelo vai para o ponto detectado.
+   • hide-on-enter-ar → esconde piso/céu virtuais ao entrar em RA.
+   • dom-overlay → botões HTML continuam visíveis durante a sessão de RA.
+   • reflection → estima a luz do ambiente real (lighting estimation), quando disponível.
+  ============================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>08 · RA com WebXR — Curso A-Frame</title>
+  <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; }
+    .voltar { position: fixed; top: 12px; left: 12px; z-index: 10; font: 600 14px system-ui, sans-serif;
+              background: rgba(17,24,39,.85); color: #fff; padding: 8px 12px; border-radius: 8px; text-decoration: none; }
+    /* Overlay HTML que permanece visível dentro da sessão de RA (dom-overlay) */
+    #painel { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 10;
+              display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; max-width: 96vw; }
+    #painel button { font: 600 14px system-ui, sans-serif; border: 0; border-radius: 999px; padding: 10px 14px;
+                     background: #F8FAFC; color: #0F172A; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+    #painel button.ativo { background: #0EA5E9; color: #fff; }
+    #dica { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); z-index: 10; max-width: 92vw;
+            background: rgba(15,23,42,.85); color: #fff; padding: 10px 14px; border-radius: 10px; font-size: 14px; text-align: center; }
+  </style>
+</head>
+<body>
+  <a class="voltar" href="../../index.html">← Índice do curso</a>
+
+  <a-scene xr-mode-ui="XRMode: ar"
+           webxr="optionalFeatures: hit-test, local-floor, dom-overlay, light-estimation; overlayElement: #overlay"
+           ar-hit-test="target: #modelo; type: footprint"
+           reflection="directionalLight: #luz-sol">
+
+    <a-assets timeout="30000">
+      <a-asset-item id="m-astronauta"  src="../../assets/modelos/astronauta.glb"></a-asset-item>
+      <a-asset-item id="m-acoplamento" src="../../assets/modelos/acoplamento.glb"></a-asset-item>
+      <a-asset-item id="m-raposa"      src="../../assets/modelos/raposa.glb"></a-asset-item>
+    </a-assets>
+
+    <a-entity camera look-controls wasd-controls position="0 1.6 2.5"></a-entity>
+
+    <!-- O alvo do hit-test. Começa com o astronauta em TAMANHO REAL (1,85 m)! -->
+    <a-entity id="modelo">
+      <a-entity id="conteudo" gltf-model="#m-astronauta" scale="0.025 0.025 0.025" position="0 0.93 0"></a-entity>
+    </a-entity>
+
+    <!-- Cenário virtual: só aparece fora da RA (pré-visualização no PC) -->
+    <a-plane hide-on-enter-ar rotation="-90 0 0" width="8" height="8" color="#CBD5E1"></a-plane>
+    <a-sky   hide-on-enter-ar color="#E2E8F0"></a-sky>
+
+    <!-- Luzes: a direcional será ajustada pela estimativa de luz real, quando houver. -->
+    <a-entity id="luz-sol" light="type: directional; intensity: 1.6; castShadow: false" position="1 3 2"></a-entity>
+    <a-entity hide-on-enter-ar light="type: hemisphere; intensity: 0.9"></a-entity>
+  </a-scene>
+
+  <!-- Elemento do dom-overlay: tudo aqui dentro aparece por cima da câmera durante a RA -->
+  <div id="overlay">
+    <div id="dica">Toque em <b>AR</b> (canto inferior direito). Mova o celular devagar até
+      aparecer o retículo no chão e <b>toque na tela</b> para posicionar.</div>
+    <div id="painel">
+      <button data-modelo="astronauta" class="ativo">Astronauta 1:1</button>
+      <button data-modelo="acoplamento">Peça CAD (5×)</button>
+      <button data-modelo="raposa">Raposa</button>
+    </div>
+  </div>
+
+  <script>
+    // Cada botão troca o modelo e a escala adequada (lembra do exemplo 04?).
+    var MODELOS = {
+      astronauta:  { src: '#m-astronauta',  scale: '0.025 0.025 0.025', y: 0.93 },
+      acoplamento: { src: '#m-acoplamento', scale: '0.005 0.005 0.005', y: 0.275 },
+      raposa:      { src: '#m-raposa',      scale: '0.008 0.008 0.008', y: 0 }
+    };
+    var conteudo = document.querySelector('#conteudo');
+
+    // Na RA, um toque na tela gera um "select" do WebXR (que posiciona o modelo).
+    // O evento beforexrselect permite cancelar esse select quando o toque é num botão HTML.
+    document.querySelector('#painel').addEventListener('beforexrselect', function (evt) {
+      evt.preventDefault();
+    });
+
+    document.querySelectorAll('#painel button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var m = MODELOS[btn.dataset.modelo];
+        conteudo.setAttribute('gltf-model', m.src);
+        conteudo.setAttribute('scale', m.scale);
+        conteudo.setAttribute('position', '0 ' + m.y + ' 0');
+        document.querySelectorAll('#painel button').forEach(function (b) { b.classList.remove('ativo'); });
+        btn.classList.add('ativo');
+      });
+    });
+
+    // Eventos do hit-test: atualizam a dica para o usuário
+    var cena = document.querySelector('a-scene');
+    var dica = document.querySelector('#dica');
+    cena.addEventListener('enter-vr', function () {
+      if (cena.is('ar-mode')) dica.textContent = 'Procurando superfícies… mova o celular devagar.';
+    });
+    cena.addEventListener('ar-hit-test-achieved', function () {
+      dica.textContent = 'Superfície encontrada! Toque na tela para posicionar o modelo.';
+    });
+    cena.addEventListener('ar-hit-test-select', function () {
+      dica.textContent = 'Pronto! Toque de novo em outro ponto para mover.';
+    });
+
+    // Avisa quem não tem suporte a RA imersiva (ex.: iPhone, PC)
+    if (navigator.xr && navigator.xr.isSessionSupported) {
+      navigator.xr.isSessionSupported('immersive-ar').then(function (ok) {
+        if (!ok) dica.innerHTML = 'Este navegador não suporta RA via WebXR (pré-visualização 3D apenas).<br>' +
+          'Use Chrome no Android (ARCore) ou os óculos Quest — ou os exemplos 09 e 10.';
+      });
+    } else {
+      dica.innerHTML = 'WebXR indisponível neste navegador. No iPhone, use os exemplos 09 e 10.';
+    }
+  </script>
+</body>
+</html>

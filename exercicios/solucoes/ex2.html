@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<!-- SOLUÇÃO — Exercício 2: dois jeitos de acertar a escala de um modelo -->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solução 2 · Meu modelo 3D — Curso A-Frame</title>
+  <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+  <script src="../../js/curso-utilitarios.js"></script>
+</head>
+<body>
+  <a-scene reflection="directionalLight: #sol" background="color: #1E293B">
+    <a-assets timeout="30000">
+      <a-asset-item id="lanterna"    src="../../assets/modelos/lanterna.glb"></a-asset-item>
+      <a-asset-item id="acoplamento" src="../../assets/modelos/acoplamento.glb"></a-asset-item>
+      <img id="grade" src="../../assets/texturas/grade.png">
+    </a-assets>
+
+    <a-mixin id="placa-texto" text="font: ../../assets/fontes/dejavu-pt-sdf.json; width: 1.4; wrapCount: 34; align: center; color: #E2E8F0"></a-mixin>
+
+    <a-entity camera look-controls wasd-controls position="0 1.6 2.5"></a-entity>
+    <a-plane rotation="-90 0 0" width="10" height="10" material="src: #grade; repeat: 5 5"></a-plane>
+
+    <!-- JEITO 1 — à mão: a placa mostrou 15,5 × 25,7 × 4,6 unidades.
+         Quero 1,5 m de altura → scale = 1,5 ÷ 25,7 ≈ 0,058. A origem já está na base. -->
+    <a-cylinder position="-1 0.05 -1" radius="0.6" height="0.1" color="#334155"></a-cylinder>
+    <a-entity gltf-model="#lanterna" position="-1 0.1 -1" scale="0.058 0.058 0.058"
+              medir-modelo="saida: #medidas1"></a-entity>
+    <a-entity position="-1 2.05 -1"><a-plane width="1.5" height="0.42" color="#0F172A"></a-plane>
+      <a-entity id="medidas1" mixin="placa-texto" position="0 0 0.01"></a-entity></a-entity>
+
+    <!-- JEITO 2 — automático: ajustar-tamanho escala para 0,5 m de LARGURA e apoia no pedestal.
+         Útil quando não sabemos a unidade (CAD em mm, modelos em cm, polegadas…). -->
+    <a-cylinder position="1 0.45 -1" radius="0.35" height="0.9" color="#334155"></a-cylinder>
+    <a-entity gltf-model="#acoplamento" position="1 0.9 -1" ajustar-tamanho="largura: 0.5"
+              animation="property: rotation; to: 0 360 0; loop: true; dur: 12000; easing: linear"></a-entity>
+    <a-entity position="1 2.05 -1"><a-plane width="1.5" height="0.42" color="#0F172A"></a-plane>
+      <a-entity mixin="placa-texto" position="0 0 0.01" text="value: ajustar-tamanho=&quot;largura: 0.5&quot;\n(peça CAD em mm → 50 cm)"></a-entity></a-entity>
+
+    <!-- Créditos -->
+    <a-entity position="0 0.6 0.2" rotation="-30 0 0">
+      <a-plane width="2.6" height="0.32" color="#0F172A"></a-plane>
+      <a-entity mixin="placa-texto" position="0 0 0.01"
+                text="value: Lanterna: Khronos glTF Sample Assets (CC0 / CC-BY 4.0) · Acoplamento: modelo CAD do curso (CC0); width: 2.5; wrapCount: 60; color: #FDE68A"></a-entity>
+    </a-entity>
+
+    <a-entity light="type: hemisphere; intensity: 1"></a-entity>
+    <a-entity id="sol" light="type: directional; intensity: 2" position="2 4 3"></a-entity>
+  </a-scene>
+</body>
+</html>

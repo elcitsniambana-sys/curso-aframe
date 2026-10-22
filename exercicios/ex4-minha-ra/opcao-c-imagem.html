@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<!-- EXERCÍCIO 4 · Opção C — Sua imagem como alvo (MindAR). Funciona em Android e iPhone.
+     Atenção: MindAR 1.2.5 → A-Frame 1.5.0. -->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ex. 4 · Opção C (imagem) — Curso A-Frame</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <script src="../../js/curso-utilitarios.js"></script>
+</head>
+<body style="margin: 0;">
+  <!-- TODO: troque imageTargetSrc pelo SEU .mind (ex.: ../../assets/meus-modelos/targets.mind) -->
+  <a-scene mindar-image="imageTargetSrc: ../../assets/marcadores/alvo-curso.mind"
+           color-space="sRGB" renderer="colorManagement: true; physicallyCorrectLights: true"
+           xr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false"
+           gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/versioned/decoders/1.5.6/">
+    <a-assets timeout="30000">
+      <!-- TODO: troque pelo seu arquivo -->
+      <a-asset-item id="meu-modelo" src="../../assets/modelos/raposa.glb"></a-asset-item>
+    </a-assets>
+
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <a-entity mindar-image-target="targetIndex: 0">
+      <!-- rotation 90° em X: o "para cima" do modelo passa a sair da imagem -->
+      <a-entity rotation="90 0 0">
+        <!-- TODO: tamanho em "larguras de imagem" (0.5 = metade da largura) -->
+        <a-entity gltf-model="#meu-modelo" ajustar-tamanho="altura: 0.5"></a-entity>
+      </a-entity>
+    </a-entity>
+
+    <a-entity light="type: hemisphere; intensity: 1.5"></a-entity>
+    <a-entity light="type: directional; intensity: 2" position="0 1 1"></a-entity>
+  </a-scene>
+</body>
+</html>

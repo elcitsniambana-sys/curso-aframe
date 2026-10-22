@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  CURSO A-FRAME · Exemplo 03 — Materiais, texturas, luz e sombra
+  ------------------------------------------------------------
+  Conceitos:
+   • <a-assets>: pré-carrega imagens/modelos/sons ANTES de a cena começar.
+   • Componente material: color, src (textura), repeat, roughness, metalness,
+     emissive, opacity/transparent, wireframe, shader: flat | standard.
+   • Material PBR (Physically Based Rendering) — o padrão do A-Frame (MeshStandardMaterial).
+   • Luzes: ambient, hemisphere, directional, point, spot.
+   • Sombras: shadow no <a-scene> + castShadow na luz + shadow="cast/receive" nos objetos.
+   • Céu 360°: <a-sky src="..."> com imagem equirretangular (proporção 2:1).
+  ============================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>03 · Materiais, luz e sombra — Curso A-Frame</title>
+  <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+  <style>
+    .voltar { position: fixed; top: 12px; left: 12px; z-index: 10; font: 600 14px system-ui, sans-serif;
+              background: rgba(17,24,39,.85); color: #fff; padding: 8px 12px; border-radius: 8px; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <a class="voltar" href="../../index.html">← Índice do curso</a>
+
+  <!-- shadow="type: pcf" liga o mapa de sombras do renderizador (pcf = bordas suaves).
+       Obs.: o antigo "pcfsoft" foi descontinuado no A-Frame 1.8 — use "pcf". -->
+  <a-scene shadow="type: pcf" renderer="antialias: true">
+
+    <!-- 1) Gerenciador de assets: o A-Frame espera tudo carregar e mostra uma tela de carregamento. -->
+    <a-assets timeout="15000">
+      <img id="tijolos" src="../../assets/texturas/tijolos.jpg">
+      <img id="madeira" src="../../assets/texturas/madeira.jpg">
+      <img id="xadrez"  src="../../assets/texturas/xadrez.png">
+      <img id="ceu"     src="../../assets/ceu/ceu-360.jpg">
+    </a-assets>
+
+    <a-entity camera look-controls wasd-controls position="0 1.6 1.5"></a-entity>
+
+    <!-- 2) Céu 360° com foto/imagem equirretangular -->
+    <a-sky src="#ceu" rotation="0 -90 0"></a-sky>
+
+    <!-- 3) Piso que RECEBE sombra, textura xadrez repetida -->
+    <a-plane rotation="-90 0 0" width="12" height="12"
+             material="src: #xadrez; repeat: 6 6; roughness: 0.9"
+             shadow="receive: true"></a-plane>
+
+    <!-- 4) Parede de tijolos: a textura repete 3 × 2 vezes para não "esticar". -->
+    <a-box position="0 1.5 -4" width="6" height="3" depth="0.2"
+           material="src: #tijolos; repeat: 3 2; roughness: 1"
+           shadow="cast: true; receive: true"></a-box>
+
+    <!-- 5) Mesa de madeira (textura no tampo) -->
+    <a-entity position="0 0 -2.2">
+      <a-box position="0 0.75 0" width="2.4" height="0.06" depth="1" material="src: #madeira; roughness: 0.6" shadow="cast: true; receive: true"></a-box>
+      <a-box position="-1.1 0.36 0" width="0.08" height="0.72" depth="0.9" color="#3F2A1A" shadow="cast: true"></a-box>
+      <a-box position=" 1.1 0.36 0" width="0.08" height="0.72" depth="0.9" color="#3F2A1A" shadow="cast: true"></a-box>
+
+      <!-- 6) PBR: a mesma cor, variando roughness (rugosidade) da esquerda para a direita -->
+      <a-sphere position="-0.9 0.92 -0.2" radius="0.14" material="color: #C0C7D1; metalness: 1; roughness: 0.05" shadow="cast: true"></a-sphere>
+      <a-sphere position="-0.45 0.92 -0.2" radius="0.14" material="color: #C0C7D1; metalness: 1; roughness: 0.3"  shadow="cast: true"></a-sphere>
+      <a-sphere position="0 0.92 -0.2"     radius="0.14" material="color: #C0C7D1; metalness: 1; roughness: 0.6"  shadow="cast: true"></a-sphere>
+      <a-sphere position="0.45 0.92 -0.2"  radius="0.14" material="color: #C0C7D1; metalness: 0; roughness: 0.6"  shadow="cast: true"></a-sphere>
+      <a-sphere position="0.9 0.92 -0.2"   radius="0.14" material="color: #C0C7D1; metalness: 0; roughness: 1"    shadow="cast: true"></a-sphere>
+
+      <!-- 7) Outros tipos de material -->
+      <a-box      position="-0.8 0.93 0.25" width="0.25" height="0.25" depth="0.25" material="color: #10B981; shader: flat"></a-box>        <!-- sem iluminação -->
+      <a-box      position="-0.3 0.93 0.25" width="0.25" height="0.25" depth="0.25" material="color: #3B82F6; opacity: 0.45; transparent: true"></a-box>
+      <a-torus-knot position="0.25 0.95 0.25" radius="0.1" radius-tubular="0.025" material="color: #F59E0B; wireframe: true"></a-torus-knot>
+      <a-sphere   position="0.8 0.93 0.25" radius="0.12" material="color: #111827; emissive: #F43F5E; emissiveIntensity: 1"></a-sphere> <!-- "brilha" -->
+    </a-entity>
+
+    <!-- Legendas: texto branco sobre uma "placa" escura semitransparente (legível sobre qualquer fundo) -->
+    <a-plane position="0 1.42 -2.45" width="2.5" height="0.16" material="color: #111827; opacity: 0.8; transparent: true">
+      <a-text value="metal liso → metal médio → metal rugoso → plástico → plástico fosco" align="center" width="2.4"
+              color="#F9FAFB" position="0 0 0.01" font="../../assets/fontes/dejavu-pt-sdf.json"></a-text>
+    </a-plane>
+    <a-plane position="0 1.2 -1.9" width="2" height="0.14" material="color: #111827; opacity: 0.8; transparent: true">
+      <a-text value="flat · transparente · wireframe · emissivo" align="center" width="2"
+              color="#F9FAFB" position="0 0 0.01" font="../../assets/fontes/dejavu-pt-sdf.json"></a-text>
+    </a-plane>
+
+    <!-- 8) LUZES. Quando você declara qualquer luz, o A-Frame REMOVE as luzes padrão. -->
+    <a-entity light="type: hemisphere; color: #DDEEFF; groundColor: #5A4A3A; intensity: 0.8"></a-entity>
+
+    <!-- Luz direcional = "sol". castShadow liga sombras; shadowCameraXXX define a área coberta. -->
+    <a-entity id="sol" position="3 5 2"
+              light="type: directional; intensity: 2; castShadow: true;
+                     shadowMapWidth: 2048; shadowMapHeight: 2048;
+                     shadowCameraLeft: -5; shadowCameraRight: 5; shadowCameraTop: 5; shadowCameraBottom: -5"
+              animation="property: position; from: 3 5 2; to: -3 5 2; dir: alternate; loop: true; dur: 8000; easing: easeInOutSine"></a-entity>
+
+    <!-- Luz pontual quente perto da parede -->
+    <a-entity position="-2 1.2 -3.6" light="type: point; color: #FFB46B; intensity: 3; distance: 4"></a-entity>
+    <a-sphere position="-2 1.2 -3.6" radius="0.05" material="shader: flat; color: #FFB46B"></a-sphere>
+  </a-scene>
+</body>
+</html>

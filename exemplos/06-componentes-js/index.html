@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  CURSO A-FRAME · Exemplo 06 — Componentes personalizados (JavaScript)
+  ------------------------------------------------------------
+  Abra também o arquivo componentes.js (nesta mesma pasta): é lá que está a lógica.
+  Aqui no HTML apenas USAMOS os componentes como atributos, igual aos nativos.
+  Experimente no Inspector (Ctrl + Alt + I): selecione o cubo e mude
+  "girar → velocidade" ao vivo — o método update() é chamado na hora.
+  ============================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>06 · Componentes em JavaScript — Curso A-Frame</title>
+  <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+  <!-- Nossos componentes: precisam vir DEPOIS do A-Frame e ANTES do <a-scene>. -->
+  <script src="componentes.js"></script>
+  <style>
+    .voltar { position: fixed; top: 12px; left: 12px; z-index: 10; font: 600 14px system-ui, sans-serif;
+              background: rgba(17,24,39,.85); color: #fff; padding: 8px 12px; border-radius: 8px; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <a class="voltar" href="../../index.html">← Índice do curso</a>
+
+  <a-scene cursor="rayOrigin: mouse" raycaster="objects: .clicavel" background="color: #0F172A">
+
+    <a-mixin id="rotulo" text="font: ../../assets/fontes/dejavu-pt-sdf.json; align: center; width: 1.5; wrapCount: 22; color: #E2E8F0"></a-mixin>
+
+    <a-entity camera look-controls wasd-controls position="0 1.6 1.2">
+      <a-cursor raycaster="objects: .clicavel" fuse-timeout="1500" color="#F8FAFC"></a-cursor>
+    </a-entity>
+
+    <!-- 1) girar: três cubos, o mesmo componente com parâmetros diferentes -->
+    <a-box position="-2.6 1.2 -3" scale="0.5 0.5 0.5" color="#6366F1" girar="velocidade: 30;  eixo: y"></a-box>
+    <a-box position="-2.0 1.2 -3" scale="0.5 0.5 0.5" color="#8B5CF6" girar="velocidade: 90;  eixo: x"></a-box>
+    <a-box position="-1.4 1.2 -3" scale="0.5 0.5 0.5" color="#A855F7" girar="velocidade: 180; eixo: z"></a-box>
+    <a-entity mixin="rotulo" position="-2 2.05 -3" text="value: girar (velocidade, eixo)\ntick() a cada quadro"></a-entity>
+
+    <!-- 2) trocar-cor + 5) mostrar-evento (um componente ouvindo o evento de outro) -->
+    <a-sphere id="esfera" class="clicavel" position="0 1.2 -3" radius="0.4" color="#E11D48"
+              trocar-cor="cores: #E11D48, #2563EB, #16A34A, #F59E0B, #F8FAFC"></a-sphere>
+    <a-entity mixin="rotulo" position="0 2.05 -3" text="value: trocar-cor (clique na esfera)"></a-entity>
+    <a-entity mixin="rotulo" position="0 0.5 -2.8" text="value: evento: (nenhum ainda); wrapCount: 30"
+              mostrar-evento="evento: cor-trocada; origem: #esfera; prefixo: cor-trocada → "></a-entity>
+
+    <!-- 4) encarar-camera: o painel sempre gira para você (ande com W A S D) -->
+    <a-entity position="2.2 1.3 -3" encarar-camera>
+      <a-plane width="1.4" height="0.7" material="color: #1E293B; opacity: 0.9; transparent: true"></a-plane>
+      <a-entity mixin="rotulo" position="0 0 0.01" text="value: encarar-camera\nEu sempre olho para você!; width: 1.3; wrapCount: 18"></a-entity>
+    </a-entity>
+
+    <!-- 3) gerador: clique no piso para criar objetos -->
+    <a-plane class="clicavel" rotation="-90 0 0" width="12" height="12" color="#334155" gerador="max: 30; forma: sphere"></a-plane>
+    <a-entity mixin="rotulo" position="0 0.02 -1.6" rotation="-90 0 0"
+              text="value: gerador: clique no piso para criar esferas (máx. 30); width: 3; wrapCount: 40; color: #94A3B8"></a-entity>
+
+    <a-entity light="type: hemisphere; intensity: 1"></a-entity>
+    <a-entity light="type: directional; intensity: 1.5" position="2 4 2"></a-entity>
+  </a-scene>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<!--
+  EXERCÍCIO 4 — Minha Realidade Aumentada (≈ 15 min)
+  Página-guia: escolha UMA das três opções conforme o seu celular.
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercício 4 · Minha RA — Curso A-Frame</title>
+  <style>
+    :root { --bg: #F8FAFC; --fg: #0F172A; --card: #FFFFFF; --muted: #475569; --line: #E2E8F0; --acc: #0EA5E9; }
+    @media (prefers-color-scheme: dark) { :root { --bg: #0B1220; --fg: #E2E8F0; --card: #111A2E; --muted: #94A3B8; --line: #1E293B; } }
+    body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 system-ui, sans-serif; }
+    main { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
+    h1 { font-size: 1.6rem; margin: .2em 0 .4em; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; margin: 14px 0; }
+    .card h2 { margin: 0 0 .3em; font-size: 1.15rem; }
+    .tag { display: inline-block; font-size: .8rem; padding: 2px 8px; border-radius: 999px; background: var(--line); margin-right: 6px; }
+    a.btn { display: inline-block; margin-top: 8px; background: var(--acc); color: #fff; text-decoration: none; padding: 8px 14px; border-radius: 10px; font-weight: 600; }
+    ol { padding-left: 1.2em; } code { background: var(--line); padding: 1px 5px; border-radius: 5px; }
+    .muted { color: var(--muted); }
+  </style>
+</head>
+<body>
+<main>
+  <p><a href="../../index.html">← Índice do curso</a></p>
+  <h1>Exercício 4 — Coloque o SEU modelo em Realidade Aumentada</h1>
+  <p class="muted">Use o modelo do exercício 2 (ou qualquer um de <code>assets/modelos</code>). Escolha a opção que funciona no seu aparelho:</p>
+
+  <div class="card">
+    <h2>Opção A — RA sem marcador (WebXR)</h2>
+    <span class="tag">Android + Chrome + ARCore</span><span class="tag">Meta Quest</span>
+    <ol>
+      <li>Abra <code>opcao-a-webxr.html</code> no editor.</li>
+      <li>Troque o <code>src</code> do <code>&lt;a-asset-item id="meu-modelo"&gt;</code> pelo seu arquivo.</li>
+      <li>Ajuste <code>ajustar-tamanho="altura: …"</code> para o tamanho REAL desejado (em metros).</li>
+      <li>Publique, abra no celular, toque em <b>AR</b>, encontre o chão e toque para posicionar.</li>
+    </ol>
+    <a class="btn" href="opcao-a-webxr.html">Abrir opção A</a>
+  </div>
+
+  <div class="card">
+    <h2>Opção B — Marcador Hiro (AR.js)</h2>
+    <span class="tag">Qualquer celular com câmera</span><span class="tag">iPhone ✓</span>
+    <ol>
+      <li>Abra <code>opcao-b-marcador.html</code> e troque o modelo.</li>
+      <li>Lembre: aqui 1 unidade = 1 lado do marcador. <code>ajustar-tamanho="altura: 1"</code> deixa o modelo da altura do marcador.</li>
+      <li>Imprima ou mostre na tela de outro aparelho a <a href="../../marcadores.html">página de marcadores</a>.</li>
+    </ol>
+    <a class="btn" href="opcao-b-marcador.html">Abrir opção B</a>
+  </div>
+
+  <div class="card">
+    <h2>Opção C — Sua própria imagem como alvo (MindAR)</h2>
+    <span class="tag">Qualquer celular com câmera</span><span class="tag">iPhone ✓</span>
+    <ol>
+      <li>Escolha uma imagem com muitos detalhes (cartaz, capa, foto com textura).</li>
+      <li>Compile em <a href="https://hiukim.github.io/mind-ar-js-doc/tools/compile" target="_blank" rel="noopener">MindAR Image Targets Compiler</a> → baixe o <code>targets.mind</code>.</li>
+      <li>Envie o <code>.mind</code> e a imagem para <code>assets/meus-modelos/</code> e ajuste <code>imageTargetSrc</code> em <code>opcao-c-imagem.html</code>.</li>
+      <li>Troque o modelo. Aqui 1 unidade = LARGURA da imagem; gire 90° em X para o modelo "ficar em pé".</li>
+    </ol>
+    <a class="btn" href="opcao-c-imagem.html">Abrir opção C</a>
+  </div>
+
+  <p class="muted">Solução de referência (opção B): <a href="../solucoes/ex4.html">solucoes/ex4.html</a></p>
+</main>
+</body>
+</html>

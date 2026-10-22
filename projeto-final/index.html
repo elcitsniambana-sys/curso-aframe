@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  PROJETO FINAL — Mostruário 3D (RV + RA)
+  ------------------------------------------------------------
+  Uma galeria virtual que você personaliza editando APENAS a lista ACERVO
+  (no <script> lá embaixo). Cada item vira um pedestal com modelo, título e um
+  painel de informações que aparece ao clicar.
+
+  Recursos reunidos de todo o curso:
+   • environment + movement-controls + checkpoint (RV, exemplo 07)
+   • laser-controls, cursor de olhar e mouse (exemplos 05 e 07)
+   • ajustar-tamanho (modelos de qualquer unidade, exercício 2)
+   • botões "VR" e "AR": em RA (Android/Quest) o cenário some e o acervo
+     aparece à sua volta, no seu espaço real (hide-on-enter-ar).
+   • Componentes próprios criados POR JAVASCRIPT a partir de dados (exemplo 06).
+
+  Para personalizar:
+   1. Envie seus .glb para assets/meus-modelos/
+   2. Edite ACERVO: titulo, arquivo, altura (m), descricao, credito.
+   3. Commit → aguarde ~1 min → recarregue.  Compartilhe o link (ou o QR do índice)!
+  ============================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Projeto final · Mostruário 3D — Curso A-Frame</title>
+  <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.7.0/dist/aframe-extras.controls.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.7.0/dist/aframe-extras.misc.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aframe-environment-component@1.5.0/dist/aframe-environment-component.min.js"></script>
+  <script src="../js/curso-utilitarios.js"></script>
+  <style>
+    .voltar { position: fixed; top: 12px; left: 12px; z-index: 10; font: 600 14px system-ui, sans-serif;
+              background: rgba(17,24,39,.85); color: #fff; padding: 8px 12px; border-radius: 8px; text-decoration: none; }
+  </style>
+
+  <script>
+    /* ------------------------------------------------------------------
+       Componente "peca-do-acervo": monta pedestal + modelo + título + painel.
+       Recebe os dados de um item do ACERVO e cria as entidades filhas.
+       ------------------------------------------------------------------ */
+    AFRAME.registerComponent('peca-do-acervo', {
+      schema: {
+        titulo:    { type: 'string' },
+        arquivo:   { type: 'string' },
+        altura:    { type: 'number', default: 1 },
+        descricao: { type: 'string', default: '' },
+        credito:   { type: 'string', default: '' },
+        cor:       { type: 'color', default: '#334155' }
+      },
+      init: function () {
+        var d = this.data, el = this.el;
+        var FONTE = '../assets/fontes/dejavu-pt-sdf.json';
+
+        // Pedestal (cilindro baixo) — clicável para abrir/fechar o painel
+        var pedestal = document.createElement('a-cylinder');
+        pedestal.setAttribute('radius', 0.55);
+        pedestal.setAttribute('height', 0.4);
+        pedestal.setAttribute('position', '0 0.2 0');
+        pedestal.setAttribute('material', { color: d.cor, roughness: 0.6 });
+        pedestal.setAttribute('shadow', 'cast: true; receive: true');
+        pedestal.classList.add('clicavel');
+        el.appendChild(pedestal);
+
+        // Modelo: ajustar-tamanho resolve a escala, qualquer que seja a unidade do arquivo
+        var modelo = document.createElement('a-entity');
+        modelo.setAttribute('gltf-model', 'url(' + d.arquivo + ')');
+        modelo.setAttribute('position', '0 0.4 0');
+        modelo.setAttribute('ajustar-tamanho', { altura: d.altura });
+        modelo.setAttribute('shadow', 'cast: true');
+        modelo.classList.add('clicavel');
+        el.appendChild(modelo);
+
+        // Título acima do modelo
+        var titulo = document.createElement('a-entity');
+        titulo.setAttribute('position', { x: 0, y: 0.4 + d.altura + 0.25, z: 0 });
+        titulo.setAttribute('text', { value: d.titulo, font: FONTE, align: 'center', width: 2, wrapCount: 22, color: '#FFFFFF' });
+        el.appendChild(titulo);
+
+        // Painel de informações (escondido até clicar)
+        var painel = document.createElement('a-entity');
+        painel.setAttribute('position', { x: 0, y: 0.4 + d.altura * 0.5 + 0.2, z: 0.75 });
+        painel.setAttribute('visible', false);
+        painel.innerHTML =
+          '<a-plane width="1.5" height="0.85" material="color: #0F172A; opacity: 0.92; transparent: true"></a-plane>';
+        var texto = document.createElement('a-entity');
+        texto.setAttribute('position', '0 0 0.01');
+        texto.setAttribute('text', { value: d.titulo + '\n\n' + d.descricao + '\n\n' + d.credito,
+                                     font: FONTE, align: 'center', width: 1.4, wrapCount: 32, color: '#E2E8F0' });
+        painel.appendChild(texto);
+        el.appendChild(painel);
+
+        // Clique no pedestal ou no modelo: mostra/esconde o painel
+        var alternar = function () { painel.setAttribute('visible', !painel.getAttribute('visible')); };
+        pedestal.addEventListener('click', alternar);
+        modelo.addEventListener('click', alternar);
+      }
+    });
+  </script>
+</head>
+<body>
+  <a class="voltar" href="../index.html">← Índice do curso</a>
+
+  <a-scene xr-mode-ui="XRMode: xr"
+           webxr="optionalFeatures: local-floor"
+           renderer="antialias: true; foveationLevel: 1"
+           shadow="type: pcf"
+           reflection="directionalLight: #sol"
+           cursor="rayOrigin: mouse" raycaster="objects: .clicavel">
+
+    <!-- Ambiente: escondido em RA -->
+    <a-entity hide-on-enter-ar environment="preset: starry; lighting: none; ground: hills; groundColor: #1E293B; groundColor2: #0F172A; grid: dots; gridColor: #38BDF8; dressingAmount: 40"></a-entity>
+
+    <!-- Rig do usuário -->
+    <a-entity id="rig" position="0 0 4"
+              movement-controls="controls: checkpoint, gamepad, trackpad, keyboard, touch; speed: 0.15"
+              checkpoint-controls="mode: animate; animateSpeed: 6">
+      <a-entity camera position="0 1.6 0" look-controls>
+        <a-cursor raycaster="objects: .clicavel" fuse-timeout="1500" color="#FFFFFF"></a-cursor>
+      </a-entity>
+      <a-entity laser-controls="hand: left"  raycaster="objects: .clicavel; far: 30"></a-entity>
+      <a-entity laser-controls="hand: right" raycaster="objects: .clicavel; far: 30"></a-entity>
+    </a-entity>
+
+    <!-- O acervo é inserido aqui pelo script -->
+    <a-entity id="acervo"></a-entity>
+
+    <!-- Disco central de teletransporte -->
+    <a-cylinder hide-on-enter-ar class="clicavel" checkpoint position="0 0.02 1.5" radius="0.45" height="0.04"
+                material="color: #38BDF8; opacity: 0.6; transparent: true; emissive: #0EA5E9"></a-cylinder>
+
+    <!-- Título da exposição -->
+    <a-entity id="titulo-expo" position="0 3.2 -4.5"
+              text="value: MOSTRUÁRIO 3D\nde Fulana de Tal; font: ../assets/fontes/dejavu-pt-sdf.json; align: center; width: 6; wrapCount: 22; color: #F8FAFC"></a-entity>
+
+    <!-- Luzes -->
+    <a-entity hide-on-enter-ar light="type: hemisphere; color: #CBD5E1; groundColor: #1E293B; intensity: 1"></a-entity>
+    <a-entity id="sol" position="3 6 4"
+              light="type: directional; intensity: 2; castShadow: true; shadowCameraLeft: -8; shadowCameraRight: 8; shadowCameraTop: 8; shadowCameraBottom: -8"></a-entity>
+  </a-scene>
+
+  <script>
+    /* ==================================================================
+       ACERVO — EDITE AQUI! Cada objeto vira um pedestal.
+       arquivo: caminho do .glb (relativo a esta página)
+       altura:  altura desejada do modelo, em metros
+       ================================================================== */
+    var ACERVO = [
+      { titulo: 'Astronauta', arquivo: '../assets/modelos/astronauta.glb', altura: 1.8,
+        descricao: 'Traje de atividade extraveicular.', credito: 'NASA 3D Resources (uso livre)', cor: '#1E3A8A' },
+      { titulo: 'Telescópio Hubble', arquivo: '../assets/modelos/hubble.glb', altura: 1.6,
+        descricao: 'Telescópio espacial lançado em 1990.', credito: 'NASA 3D Resources (uso livre)', cor: '#334155' },
+      { titulo: 'Acoplamento de flanges', arquivo: '../assets/modelos/acoplamento.glb', altura: 0.6,
+        descricao: 'Peça CAD modelada em mm, exportada STEP → GLB.', credito: 'Modelo do curso (CC0)', cor: '#78350F' },
+      { titulo: 'Lanterna', arquivo: '../assets/modelos/lanterna.glb', altura: 1.5,
+        descricao: 'glTF otimizado: texturas em WebP (9,6 MB → 0,44 MB).', credito: 'Khronos glTF Sample Assets (CC0 / CC-BY 4.0)', cor: '#14532D' },
+      { titulo: 'Raposa', arquivo: '../assets/modelos/raposa.glb', altura: 0.7,
+        descricao: 'Modelo com esqueleto e animações (Survey, Walk, Run).', credito: 'PixelMannen (CC0), tomkranis e AsoboStudio/scurest (CC-BY 4.0)', cor: '#7C2D12' }
+    ];
+
+    // Distribui as peças num arco de frente para o visitante
+    var raio = 4.5, abertura = 110;   // graus
+    var acervoEl = document.getElementById('acervo');
+    ACERVO.forEach(function (item, i) {
+      var n = ACERVO.length;
+      var ang = (n === 1 ? 0 : (-abertura / 2 + abertura * i / (n - 1))) * Math.PI / 180;
+      var x = raio * Math.sin(ang), z = -raio * Math.cos(ang) + 1.5;
+      var peca = document.createElement('a-entity');
+      peca.setAttribute('position', { x: x, y: 0, z: z });
+      peca.setAttribute('rotation', { x: 0, y: -ang * 180 / Math.PI, z: 0 });   // vira para o centro
+      peca.setAttribute('peca-do-acervo', item);
+      acervoEl.appendChild(peca);
+      // Disco de teletransporte em frente a cada peça
+      var disco = document.createElement('a-cylinder');
+      disco.setAttribute('class', 'clicavel');
+      disco.setAttribute('checkpoint', '');
+      disco.setAttribute('hide-on-enter-ar', '');
+      disco.setAttribute('position', { x: x * 0.62, y: 0.02, z: z * 0.62 + 0.6 });
+      disco.setAttribute('radius', 0.35); disco.setAttribute('height', 0.04);
+      disco.setAttribute('material', 'color: #38BDF8; opacity: 0.45; transparent: true; emissive: #0EA5E9');
+      acervoEl.appendChild(disco);
+    });
+  </script>
+</body>
+</html>

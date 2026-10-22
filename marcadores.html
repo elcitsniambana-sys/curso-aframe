@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Marcadores para imprimir · Curso A-Frame</title>
+  <style>
+    body { margin: 0; font: 16px/1.5 system-ui, sans-serif; color: #111827; background: #F3F4F6; }
+    .tela { max-width: 900px; margin: 0 auto; padding: 20px 16px; }
+    .folha { background: #fff; margin: 18px auto; padding: 24px; max-width: 800px; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.08); text-align: center; }
+    .folha img { max-width: 100%; height: auto; }
+    .folha.marcador img { width: 14cm; max-width: 100%; }
+    .folha.alvo img { width: 17cm; max-width: 100%; }
+    h1 { font-size: 1.5rem; } h2 { margin: 0 0 6px; font-size: 1.2rem; }
+    .nota { color: #4B5563; font-size: .95rem; margin: 6px 0 14px; }
+    .botoes { display: flex; gap: 10px; flex-wrap: wrap; }
+    .botoes a, .botoes button { font: 600 14px system-ui; padding: 9px 14px; border-radius: 10px; border: 1px solid #D1D5DB; background: #fff; color: #111827; text-decoration: none; cursor: pointer; }
+    @media print {
+      body { background: #fff; } .tela > p, .tela > h1, .botoes { display: none; }
+      .folha { box-shadow: none; margin: 0; padding: 0; page-break-after: always; break-after: page; }
+    }
+  </style>
+</head>
+<body>
+<div class="tela">
+  <p><a href="index.html">← Índice do curso</a></p>
+  <h1>Marcadores e alvos de Realidade Aumentada</h1>
+  <p>Imprima em A4 (tamanho real, sem "ajustar à página" se possível) ou abra esta página em outro aparelho e aponte o celular para a tela.
+     Papel fosco funciona melhor que brilhante; evite dobras e reflexos.</p>
+  <div class="botoes">
+    <button onclick="window.print()">Imprimir as três folhas</button>
+    <a href="exemplos/09-ra-marcador-arjs/">Abrir exemplo 09 (marcadores)</a>
+    <a href="exemplos/10-ra-imagem-mindar/">Abrir exemplo 10 (imagem)</a>
+  </div>
+
+  <div class="folha marcador">
+    <h2>Marcador HIRO</h2>
+    <p class="nota">Exemplo 09 → astronauta · Exercício 4 (opção B) → seu modelo</p>
+    <img src="assets/marcadores/hiro.png" alt="Marcador Hiro do AR.js">
+  </div>
+
+  <div class="folha marcador">
+    <h2>Marcador do curso (padrão personalizado)</h2>
+    <p class="nota">Exemplo 09 → peça CAD · arquivo de padrão: assets/marcadores/marcador-curso.patt</p>
+    <img src="assets/marcadores/marcador-curso.png" alt="Marcador personalizado do curso">
+  </div>
+
+  <div class="folha alvo">
+    <h2>Imagem-alvo do MindAR</h2>
+    <p class="nota">Exemplo 10 → peça CAD e lanterna · arquivo compilado: assets/marcadores/alvo-curso.mind</p>
+    <img src="assets/marcadores/alvo-curso.png" alt="Imagem-alvo do curso para MindAR">
+  </div>
+</div>
+</body>
+</html>

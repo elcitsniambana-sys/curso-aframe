@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  CURSO A-FRAME · Exemplo 09 — RA com marcador (AR.js)
+  ------------------------------------------------------------
+  Funciona em praticamente QUALQUER celular com câmera (Android e iPhone),
+  pois não depende de WebXR: o AR.js analisa o vídeo da câmera (getUserMedia)
+  e estima a pose do marcador quadrado (biblioteca ARToolKit compilada para a Web).
+
+  Como testar:
+   1. Abra esta página no celular (HTTPS — GitHub Pages) e permita o uso da câmera.
+   2. Aponte para o marcador HIRO       → aparece o astronauta.
+      Aponte para o MARCADOR DO CURSO   → aparece a peça CAD.
+      (imagens em assets/marcadores/: imprima ou abra na tela de outro aparelho)
+
+  ATENÇÃO À VERSÃO: o AR.js 3.4.x exige o A-Frame 1.6.0 (não o 1.8.0).
+  Misturar versões é a causa nº 1 de "tela preta" em projetos de RA.
+
+  Unidades: 1 unidade = 1 lado do marcador. O conteúdo fica "em pé" sobre ele (eixo Y).
+  ============================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>09 · RA com marcador (AR.js) — Curso A-Frame</title>
+  <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+  <!-- Versão do AR.js "marker + location" (sem NFT, mais leve) -->
+  <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js@3.4.8/aframe/build/aframe-ar.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    .voltar { position: fixed; top: 12px; left: 12px; z-index: 10; font: 600 14px system-ui, sans-serif;
+              background: rgba(17,24,39,.85); color: #fff; padding: 8px 12px; border-radius: 8px; text-decoration: none; }
+    #estado { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 10;
+              font: 600 15px system-ui, sans-serif; background: rgba(15,23,42,.85); color: #fff;
+              padding: 10px 16px; border-radius: 999px; }
+  </style>
+</head>
+<body>
+  <a class="voltar" href="../../index.html">← Índice do curso</a>
+  <div id="estado">Aponte a câmera para um marcador</div>
+
+  <a-scene embedded
+           arjs="sourceType: webcam; debugUIEnabled: false; trackingMethod: best"
+           xr-mode-ui="enabled: false"
+           renderer="logarithmicDepthBuffer: true; precision: medium"
+           gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/versioned/decoders/1.5.6/">
+
+    <a-assets timeout="30000">
+      <a-asset-item id="astronauta"  src="../../assets/modelos/astronauta.glb"></a-asset-item>
+      <a-asset-item id="acoplamento" src="../../assets/modelos/acoplamento.glb"></a-asset-item>
+    </a-assets>
+
+    <!-- Marcador 1: o clássico "Hiro" (já embutido no AR.js) -->
+    <a-marker id="m-hiro" preset="hiro" smooth="true" smoothCount="5">
+      <!-- 74 unidades × 0,015 ≈ 1,1 lado de marcador de altura -->
+      <a-entity gltf-model="#astronauta" scale="0.015 0.015 0.015" position="0 0.56 0"></a-entity>
+    </a-marker>
+
+    <!-- Marcador 2: padrão personalizado (.patt) gerado para o curso -->
+    <a-marker id="m-curso" type="pattern" url="../../assets/marcadores/marcador-curso.patt" smooth="true" smoothCount="5">
+      <!-- peça CAD em mm: 120 mm × 0,006 ≈ 0,72 lado de marcador -->
+      <a-entity gltf-model="#acoplamento" scale="0.006 0.006 0.006" position="0 0.33 0"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear"></a-entity>
+    </a-marker>
+
+    <a-entity light="type: hemisphere; intensity: 1.2"></a-entity>
+    <a-entity light="type: directional; intensity: 1.5" position="1 2 1"></a-entity>
+
+    <!-- A câmera do AR.js: uma câmera "pura", sem look-controls -->
+    <a-entity camera></a-entity>
+  </a-scene>
+
+  <script>
+    // Eventos do AR.js: markerFound / markerLost
+    var estado = document.getElementById('estado');
+    var nomes = { 'm-hiro': 'Hiro → astronauta', 'm-curso': 'Marcador do curso → peça CAD' };
+    Object.keys(nomes).forEach(function (id) {
+      var m = document.getElementById(id);
+      m.addEventListener('markerFound', function () { estado.textContent = '✔ ' + nomes[id]; });
+      m.addEventListener('markerLost',  function () { estado.textContent = 'Aponte a câmera para um marcador'; });
+    });
+  </script>
+</body>
+</html>

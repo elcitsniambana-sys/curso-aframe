@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<!-- SOLUÇÃO — Exercício 1: Minha primeira sala virtual -->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Solução 1 · Minha sala — Curso A-Frame</title>
+  <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+</head>
+<body>
+  <a-scene shadow="type: pcf">
+    <a-assets>
+      <img id="madeira" src="../../assets/texturas/madeira.jpg">
+      <img id="tijolos" src="../../assets/texturas/tijolos.jpg">
+      <img id="xadrez"  src="../../assets/texturas/xadrez.png">
+      <img id="ceu"     src="../../assets/ceu/ceu-360.jpg">
+    </a-assets>
+
+    <a-entity camera look-controls wasd-controls position="0 1.6 3"></a-entity>
+
+    <a-plane rotation="-90 0 0" width="8" height="8" material="src: #xadrez; repeat: 4 4" shadow="receive: true"></a-plane>
+
+    <!-- 1. Paredes -->
+    <a-box position="0 1.5 -4" width="8" height="3" depth="0.2" material="src: #tijolos; repeat: 4 2" shadow="receive: true"></a-box>
+    <a-box position="-4 1.5 0" rotation="0 90 0" width="8" height="3" depth="0.2" material="src: #tijolos; repeat: 4 2" shadow="receive: true"></a-box>
+    <a-box position=" 4 1.5 0" rotation="0 90 0" width="8" height="3" depth="0.2" material="src: #tijolos; repeat: 4 2" shadow="receive: true"></a-box>
+
+    <!-- 2 e 3. Mesa (grupo) com objetos filhos -->
+    <a-entity id="mesa" position="0 0 -2">
+      <a-box position="0 0.75 0" width="1.6" height="0.06" depth="0.8" material="src: #madeira" shadow="cast: true; receive: true"></a-box>
+      <a-box position="-0.75 0.36 -0.35" width="0.06" height="0.72" depth="0.06" color="#3F2A1A" shadow="cast: true"></a-box>
+      <a-box position=" 0.75 0.36 -0.35" width="0.06" height="0.72" depth="0.06" color="#3F2A1A" shadow="cast: true"></a-box>
+      <a-box position="-0.75 0.36  0.35" width="0.06" height="0.72" depth="0.06" color="#3F2A1A" shadow="cast: true"></a-box>
+      <a-box position=" 0.75 0.36  0.35" width="0.06" height="0.72" depth="0.06" color="#3F2A1A" shadow="cast: true"></a-box>
+      <a-sphere position="-0.4 0.93 0" radius="0.15" material="color: #C0C7D1; metalness: 1; roughness: 0.2" shadow="cast: true"></a-sphere>
+      <a-cylinder position="0.35 0.9 0.1" radius="0.08" height="0.24" color="#DC2626" shadow="cast: true"></a-cylinder>
+      <a-box position="0.1 0.83 -0.2" rotation="0 25 0" width="0.3" height="0.1" depth="0.2" color="#2563EB" shadow="cast: true"></a-box>
+    </a-entity>
+
+    <!-- Desafio extra: a mesma mesa girada e menor -->
+    <a-entity position="2.6 0 -2.6" rotation="0 -30 0" scale="0.7 0.7 0.7">
+      <a-box position="0 0.75 0" width="1.6" height="0.06" depth="0.8" material="src: #madeira" shadow="cast: true"></a-box>
+      <a-box position="-0.75 0.36 -0.35" width="0.06" height="0.72" depth="0.06" color="#3F2A1A"></a-box>
+      <a-box position=" 0.75 0.36 -0.35" width="0.06" height="0.72" depth="0.06" color="#3F2A1A"></a-box>
+      <a-box position="-0.75 0.36  0.35" width="0.06" height="0.72" depth="0.06" color="#3F2A1A"></a-box>
+      <a-box position=" 0.75 0.36  0.35" width="0.06" height="0.72" depth="0.06" color="#3F2A1A"></a-box>
+    </a-entity>
+
+    <!-- 4. Luminária -->
+    <a-entity light="type: point; intensity: 3; distance: 6; color: #FFD9A8; castShadow: true" position="0 2.6 -2"></a-entity>
+    <a-sphere position="0 2.6 -2" radius="0.1" material="shader: flat; color: #FFD9A8"></a-sphere>
+    <a-cylinder position="0 2.82 -2" radius="0.005" height="0.4" color="#111827"></a-cylinder>
+
+    <!-- 5. Céu 360° -->
+    <a-sky src="#ceu"></a-sky>
+
+    <!-- 6. Nome na parede -->
+    <a-text value="Sala de Fulana de Tal" font="../../assets/fontes/dejavu-pt-sdf.json"
+            position="0 2.3 -3.88" align="center" width="5" color="#FFFFFF"></a-text>
+
+    <a-entity light="type: hemisphere; intensity: 0.7"></a-entity>
+  </a-scene>
+</body>
+</html>

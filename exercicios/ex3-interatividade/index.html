@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  EXERCÍCIO 3 — Painel de controle interativo   (≈ 15 min)
+  ------------------------------------------------------------
+  Objetivo: animação + cursor + eventos + um componente JavaScript seu.
+
+  O cenário já tem um modelo e três "botões" (caixas). Faça os botões funcionarem:
+   [ ] 1. Todos os botões crescem ao passar o cursor (mouseenter/mouseleave).
+          DICA: use o mixin "realce" que já está pronto — basta acrescentar mixin="realce".
+   [ ] 2. Botão AZUL: liga/desliga a rotação do modelo.
+          DICA: a animação do modelo já escuta os eventos "pausar" e "continuar"
+          (pauseEvents/resumeEvents). Basta EMITIR esses eventos no #modelo.
+   [ ] 3. Botão VERDE: alterna o tamanho do modelo entre 1× e 2×.
+   [ ] 4. Botão LARANJA: toca o som bip (componente sound, on: click).
+   [ ] 5. Complete o componente "alternar" (abaixo, no <script>) e use-o no botão azul.
+   Desafio: um 4º botão que esconde/mostra o modelo (atributo visible).
+
+  Lembretes: a cena já tem cursor="rayOrigin: mouse" e raycaster="objects: .clicavel".
+  Só objetos com class="clicavel" recebem cliques!
+  Solução: exercicios/solucoes/ex3.html
+  ============================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Exercício 3 · Interatividade — Curso A-Frame</title>
+  <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+  <script>
+    // TODO 5: complete este componente.
+    // Ideia: ao clicar no botão, emitir um evento num ALVO, alternando entre dois nomes.
+    // Uso pretendido: <a-box alternar="alvo: #modelo; eventoA: pausar; eventoB: continuar"></a-box>
+    AFRAME.registerComponent('alternar', {
+      schema: {
+        alvo:    { type: 'selector' },
+        eventoA: { type: 'string', default: 'a' },
+        eventoB: { type: 'string', default: 'b' }
+      },
+      init: function () {
+        this.estado = false;
+        this.el.addEventListener('click', () => {
+          // TODO: inverta this.estado e emita no alvo o eventoA ou o eventoB.
+          // DICA: this.data.alvo.emit(this.estado ? this.data.eventoA : this.data.eventoB);
+        });
+      }
+    });
+  </script>
+</head>
+<body>
+  <a-scene cursor="rayOrigin: mouse" raycaster="objects: .clicavel" background="color: #F1F5F9">
+    <a-assets>
+      <a-asset-item id="hubble" src="../../assets/modelos/hubble.glb"></a-asset-item>
+      <audio id="bip" src="../../assets/sons/bip.wav" preload="auto"></audio>
+    </a-assets>
+
+    <!-- Mixin pronto para o TODO 1 -->
+    <a-mixin id="realce"
+             animation__entra="property: scale; to: 1.2 1.2 1.2; dur: 150; startEvents: mouseenter"
+             animation__sai="property: scale; to: 1 1 1; dur: 150; startEvents: mouseleave"></a-mixin>
+    <a-mixin id="rotulo" text="font: ../../assets/fontes/dejavu-pt-sdf.json; align: center; width: 1; wrapCount: 14; color: #0F172A"></a-mixin>
+
+    <a-entity camera look-controls wasd-controls position="0 1.6 1.5">
+      <a-cursor raycaster="objects: .clicavel" color="#0F172A"></a-cursor>
+    </a-entity>
+
+    <!-- O modelo controlado pelos botões. A animação "girar" já está declarada:
+         ela PAUSA ao receber o evento "pausar" e CONTINUA ao receber "continuar". -->
+    <a-entity id="modelo" gltf-model="#hubble" position="0 2.3 -3.5" scale="0.003 0.003 0.003"
+              animation__girar="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear;
+                                pauseEvents: pausar; resumeEvents: continuar"></a-entity>
+
+    <!-- Mesa de controle com 3 botões -->
+    <a-box position="0 0.45 -1.2" width="1.6" height="0.9" depth="0.5" color="#475569"></a-box>
+    <a-box id="b-girar"   class="clicavel" position="-0.5 0.95 -1.2" width="0.3" height="0.1" depth="0.3" color="#2563EB"></a-box>
+    <a-box id="b-escala"  class="clicavel" position="0 0.95 -1.2"    width="0.3" height="0.1" depth="0.3" color="#16A34A"></a-box>
+    <a-box id="b-som"     class="clicavel" position="0.5 0.95 -1.2"  width="0.3" height="0.1" depth="0.3" color="#EA580C"></a-box>
+    <a-entity mixin="rotulo" position="-0.5 1.15 -1.2" text="value: girar"></a-entity>
+    <a-entity mixin="rotulo" position="0 1.15 -1.2"    text="value: tamanho"></a-entity>
+    <a-entity mixin="rotulo" position="0.5 1.15 -1.2"  text="value: som"></a-entity>
+
+    <a-plane rotation="-90 0 0" width="10" height="10" color="#CBD5E1"></a-plane>
+    <a-entity light="type: hemisphere; intensity: 1.2"></a-entity>
+    <a-entity light="type: directional; intensity: 1.5" position="1 3 2"></a-entity>
+  </a-scene>
+
+  <script>
+    // TODO 3: botão verde alterna a escala do modelo.
+    // DICA: var grande = false;
+    //       document.querySelector('#b-escala').addEventListener('click', function () {
+    //         grande = !grande;
+    //         var s = grande ? 0.006 : 0.003;
+    //         document.querySelector('#modelo').setAttribute('scale', s + ' ' + s + ' ' + s);
+    //       });
+  </script>
+</body>
+</html>

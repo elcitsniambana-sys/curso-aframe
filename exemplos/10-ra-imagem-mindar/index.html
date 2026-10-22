@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  CURSO A-FRAME · Exemplo 10 — RA por reconhecimento de imagem (MindAR)
+  ------------------------------------------------------------
+  Em vez de um marcador quadrado preto e branco, qualquer IMAGEM rica em detalhes
+  vira alvo: cartaz, capa de livro, rótulo, figura da apostila…
+  Funciona em Android e iPhone (usa a câmera via getUserMedia, não WebXR).
+
+  Fluxo de trabalho:
+   1. Escolha uma imagem com muitos cantos e contraste (evite áreas lisas e padrões repetitivos).
+   2. Compile-a no site oficial do MindAR (Image Targets Compiler) → arquivo .mind
+      https://hiukim.github.io/mind-ar-js-doc/tools/compile
+   3. Envie o .mind para o repositório e aponte imageTargetSrc para ele.
+
+  Este exemplo usa assets/marcadores/alvo-curso.png (já compilado em alvo-curso.mind).
+
+  ATENÇÃO À VERSÃO: o MindAR 1.2.5 é documentado com o A-Frame 1.5.0.
+  Unidades: 1 unidade = LARGURA da imagem-alvo. O plano da imagem é XY (Z sai da imagem).
+  ============================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>10 · RA por imagem (MindAR) — Curso A-Frame</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <style>
+    body { margin: 0; }
+    .voltar { position: fixed; top: 12px; left: 12px; z-index: 10; font: 600 14px system-ui, sans-serif;
+              background: rgba(17,24,39,.85); color: #fff; padding: 8px 12px; border-radius: 8px; text-decoration: none; }
+    #estado { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 10;
+              font: 600 15px system-ui, sans-serif; background: rgba(15,23,42,.85); color: #fff;
+              padding: 10px 16px; border-radius: 999px; }
+  </style>
+</head>
+<body>
+  <a class="voltar" href="../../index.html">← Índice do curso</a>
+  <div id="estado">Aponte para a imagem-alvo do curso</div>
+
+  <a-scene mindar-image="imageTargetSrc: ../../assets/marcadores/alvo-curso.mind; uiScanning: yes; uiLoading: yes"
+           color-space="sRGB" renderer="colorManagement: true; physicallyCorrectLights: true"
+           xr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false"
+           gltf-model="dracoDecoderPath: https://www.gstatic.com/draco/versioned/decoders/1.5.6/">
+
+    <a-assets timeout="30000">
+      <a-asset-item id="acoplamento" src="../../assets/modelos/acoplamento.glb"></a-asset-item>
+      <a-asset-item id="lanterna"    src="../../assets/modelos/lanterna.glb"></a-asset-item>
+    </a-assets>
+
+    <!-- Câmera fixa: quem "se move" é o alvo detectado -->
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+    <!-- targetIndex: 0 → primeira imagem do arquivo .mind (um .mind pode ter várias) -->
+    <a-entity id="alvo" mindar-image-target="targetIndex: 0">
+      <!-- Moldura semitransparente do tamanho da imagem (1 × 0,7) -->
+      <a-plane width="1" height="0.7" position="0 0 0" material="color: #0EA5E9; opacity: 0.25; transparent: true"></a-plane>
+
+      <!-- Peça CAD "em pé" sobre a imagem: giramos 90° em X para o eixo Y do modelo sair da imagem -->
+      <a-entity rotation="90 0 0" position="-0.22 0 0">
+        <a-entity gltf-model="#acoplamento" scale="0.003 0.003 0.003" position="0 0.165 0"
+                  animation="property: rotation; to: 0 360 0; loop: true; dur: 8000; easing: linear"></a-entity>
+      </a-entity>
+
+      <!-- Lanterna ao lado (mesmo truque: rotation 90° em X) -->
+      <a-entity rotation="90 0 0" position="0.22 -0.12 0">
+        <a-entity gltf-model="#lanterna" scale="0.014 0.014 0.014" rotation="0 -30 0"></a-entity>
+      </a-entity>
+    </a-entity>
+
+    <a-entity light="type: hemisphere; intensity: 1.5"></a-entity>
+    <a-entity light="type: directional; intensity: 2" position="0 1 1"></a-entity>
+  </a-scene>
+
+  <script>
+    var estado = document.getElementById('estado');
+    var alvo = document.getElementById('alvo');
+    alvo.addEventListener('targetFound', function () { estado.textContent = '✔ Alvo encontrado'; });
+    alvo.addEventListener('targetLost',  function () { estado.textContent = 'Aponte para a imagem-alvo do curso'; });
+
+    // --- Diagnóstico da câmera -------------------------------------------------
+    // Se o navegador negar a câmera, o MindAR só avisa pelo evento "arError" e a
+    // animação de carregamento continuaria girando para sempre. Aqui mostramos o motivo.
+    var cena = document.querySelector('a-scene');
+    var pronto = false;
+    function avisar(msg) {
+      var carregando = document.querySelector('.mindar-ui-loading');
+      if (carregando) carregando.classList.add('hidden');
+      estado.innerHTML = msg;
+      estado.style.background = '#B91C1C';
+      estado.style.borderRadius = '14px';
+      estado.style.maxWidth = '90vw';
+      estado.style.textAlign = 'center';
+    }
+    cena.addEventListener('arReady', function () {
+      pronto = true;
+      estado.style.background = '';
+      estado.textContent = 'Câmera pronta: aponte para a imagem-alvo do curso';
+    });
+    cena.addEventListener('arError', function () {
+      avisar('Não foi possível abrir a câmera.<br>Permita o acesso à câmera nas configurações deste site, ' +
+             'feche outros apps que usam a câmera e recarregue a página.');
+    });
+    setTimeout(function () {
+      if (!pronto) avisar('Ainda carregando… Se o navegador não pediu permissão da câmera, ' +
+                          'abra esta página no Chrome ou no Safari (não dentro do WhatsApp/Instagram) e recarregue.');
+    }, 25000);
+  </script>
+</body>
+</html>

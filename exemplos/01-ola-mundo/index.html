@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<!--
+  ============================================================
+  CURSO A-FRAME · Exemplo 01 — Olá, Mundo!
+  ------------------------------------------------------------
+  Objetivo: mostrar a menor cena A-Frame possível.
+  Conceitos: <a-scene>, primitivas, atributos position/rotation/color,
+             <a-sky>, texto com acentuação (fonte MSDF personalizada).
+  Experimente: arraste com o mouse para olhar em volta; use W A S D
+  para andar; no celular, gire o aparelho. Ctrl + Alt + I abre o Inspector.
+  ============================================================
+-->
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>01 · Olá, Mundo! — Curso A-Frame</title>
+
+  <!-- 1) Uma única linha carrega o A-Frame (e o three.js embutido nele). -->
+  <script src="https://aframe.io/releases/1.8.0/aframe.min.js"></script>
+
+  <style>
+    .voltar { position: fixed; top: 12px; left: 12px; z-index: 10; font: 600 14px system-ui, sans-serif;
+              background: rgba(17,24,39,.85); color: #fff; padding: 8px 12px; border-radius: 8px; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <a class="voltar" href="../../index.html">← Índice do curso</a>
+
+  <!-- 2) <a-scene> cria o canvas WebGL, a câmera, as luzes padrão e o botão de RV. -->
+  <a-scene>
+
+    <!-- 3) Primitivas: cada uma é uma "entidade" com geometria + material prontos.
+            Unidades em METROS. Eixo Y aponta para cima; a câmera olha para -Z. -->
+    <a-box      position="-1 0.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+    <a-sphere   position="0 1.25 -5" radius="1.25"      color="#EF2D5E"></a-sphere>
+    <a-cylinder position="1 0.75 -3" radius="0.5" height="1.5" color="#FFC65D"></a-cylinder>
+
+    <!-- Um plano "deitado": girar -90° em X transforma a parede em piso. -->
+    <a-plane position="0 0 -4" rotation="-90 0 0" width="4" height="4" color="#7BC8A4"></a-plane>
+
+    <!-- 4) Texto. As fontes padrão do A-Frame só têm caracteres ASCII (sem acentos).
+            Por isso usamos uma fonte SDF gerada para o português (pasta assets/fontes). -->
+    <a-text value="Olá, Mundo! Bem-vindos à RV na Web."
+            font="../../assets/fontes/dejavu-pt-sdf.json"
+            position="0 2.9 -4" align="center" width="6" color="#1F2937"></a-text>
+
+    <!-- 5) O céu: uma esfera gigante vista por dentro. -->
+    <a-sky color="#ECECEC"></a-sky>
+
+  </a-scene>
+</body>
+</html>
